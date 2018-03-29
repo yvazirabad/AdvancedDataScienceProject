@@ -5,7 +5,7 @@ library(reshape2)     # Data transposition
 
 # Reads every yearly climate file and reshapes it, getting TAVG
 # Copied from https://rpubs.com/tterryt2/wdea_pt5
-files <- list.files(path="C:\\Users\\ivazirabad\\AdvancedDataScience\\YearlyClimate", pattern="*.csv.gz", full.names=T, recursive=FALSE)
+files <- list.files(path="C:\\Users\\ivazirabad\\AdvancedDataScience\\YearlyClimate\\by_year", pattern="*.csv.gz", full.names=T, recursive=FALSE)
 lapply(files, function(x) {
 wd_data <- read.csv(x, sep=",",header=FALSE, stringsAsFactors = FALSE)
 wd_data <- wd_data %>% select(-V5,-V6,-V7,-V8)
@@ -49,8 +49,7 @@ cat(paste("  Number of Observation Stations:   ", "   ", format(tot_sta, big.mar
           "Number of Potential Observations:   ",        format(pot_obs, big.mark = ","),  "\n",
           "   Number of Actual Observations:   ",        format(tot_obs, big.mark = ","),  "\n",
           " Number of Complete Observations:   ",        format(com_obs, big.mark = ","),  sep = ""))
-wd_data <- wd_data %>%
-  select(-TMAX, -TMIN, -DAVG)
+wd_data <- wd_data %>% select(-DAVG)
 summary(wd_data$TAVG)
 wd_data <- wd_data[complete.cases(wd_data),]
 summary(wd_data$TAVG)
@@ -66,7 +65,7 @@ wd_data$Week  <- week(wd_data$Date)
 wd_data$day  <- day(wd_data$Date)
 kable(head(wd_data), caption = "wd_data")
 wd_data <- wd_data %>%
-  select(ID, Month, Week, day, TAVG)
+  select(ID, Month, Week, day, TMAX, TMIN, TAVG)
 
 direct =  unlist(strsplit(x, '/'))[1]
 fname = unlist(strsplit(x, '/'))[2]
