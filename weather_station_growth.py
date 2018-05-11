@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os
+import os, gzip
 
 ghc_stations = {}
 
@@ -10,23 +10,22 @@ with open(r'C:\Users\ivazirabad\AdvancedDataScience\ghcnd-stations.txt') as infi
         ghc_stations[splitline[0]] = (splitline[1], splitline[2])
 
 coreset = set()
-for directory, folders, files in os.walk(r'C:\Users\ivazirabad\AdvancedDataScience\YearlyClimate\weather_station_pos'):
+for directory, folders, files in os.walk(r'C:\Users\ivazirabad\AdvancedDataScience\YearlyClimate\curated'):
     for f in files:
-        if f.endswith('weather_stations.txt'):
-            littleset = set()
-            year = os.path.splitext(f)[0].split('_')[0]
-            with open(os.path.join(directory, f)) as infile:
-                infile.readline()
-                for line in infile:
-                    splitline = line.rstrip().split('\t')
-                    littleset.add(splitline[0])
-            if year == '1900':
-                coreset = coreset.union(littleset)
-            else:
-                coreset = coreset.intersection(littleset)
-            print(year, len(coreset), sep='\t')
+        littleset = set()
+        year = os.path.splitext(f)[0].split('.')[0]
+        with gzip.open(os.path.join(directory, f), 'rt') as infile:
+            infile.readline()
+            for line in infile:
+                splitline = line.rstrip().split(',')
+                littleset.add(splitline[0][1:-1])
+        if year == '1950':
+            coreset = coreset.union(littleset)
+        else:
+            coreset = coreset.intersection(littleset)
+        print(year, len(coreset), sep='\t')
 
-with open(os.path.join(r'C:\Users\ivazirabad\AdvancedDataScience\YearlyClimate\weather_station_pos\totals\coreweatherstation.txt'), 'w') as outfile:
+with open(os.path.join(r'C:\Users\ivazirabad\AdvancedDataScience\YearlyClimate\weather_station_pos\totals\coreweatherstation2.txt'), 'w') as outfile:
     outfile.write('\t'.join(['Station', 'Lat', 'Long', '\n']))
     for station in coreset:
         if station in ghc_stations:
